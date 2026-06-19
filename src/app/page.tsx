@@ -1,26 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 
-import { mapClientDoc } from "@/lib/clients";
-import { getAdminDb } from "@/lib/firebaseAdmin";
-import type { Client } from "@/lib/types";
-
 import { DashboardPanel } from "./dashboard-panel";
-
-async function getClientsForUser(userId: string): Promise<Client[]> {
-  try {
-    const snapshot = await getAdminDb()
-      .collection("clients")
-      .where("ownerId", "==", userId)
-      .orderBy("lastActivityAt", "desc")
-      .get();
-
-    return snapshot.docs.map((doc) => mapClientDoc(doc.id, doc.data()));
-  } catch (error) {
-    console.error("Failed to load clients for dashboard:", error);
-    return [];
-  }
-}
 
 export default async function HomePage() {
   const { userId } = await auth();
@@ -47,11 +28,9 @@ export default async function HomePage() {
     );
   }
 
-  const initialClients = await getClientsForUser(userId);
-
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-6 py-10">
-      <DashboardPanel initialClients={initialClients} />
+      <DashboardPanel />
     </main>
   );
 }

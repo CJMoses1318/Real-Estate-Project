@@ -28,6 +28,7 @@ export interface Client {
   address?: string;
   searchCriteria?: string;
   stage: DealStage;
+  latestNote: string;
   lastActivityAt: number;
   createdAt: number;
 }

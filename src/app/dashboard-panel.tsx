@@ -1,16 +1,20 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import { useState } from "react";
 
-import type { Client } from "@/lib/types";
+import { ClientCard } from "@/components/ClientCard";
+import { useClientsListener } from "@/hooks/useClientsListener";
+import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
 
-interface DashboardPanelProps {
-  initialClients: Client[];
-}
-
-export function DashboardPanel({ initialClients }: DashboardPanelProps) {
-  const router = useRouter();
+export function DashboardPanel() {
+  const { userId } = useAuth();
+  const { ready: firebaseReady, error: firebaseError } = useFirebaseAuth();
+  const {
+    clients,
+    loading,
+    error: listenerError,
+  } = useClientsListener(userId, firebaseReady);
   const [message, setMessage] = useState<string>("");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
 
@@ -49,12 +53,14 @@ export function DashboardPanel({ initialClients }: DashboardPanelProps) {
 
       setStatus("idle");
       setMessage("Sample client created successfully.");
-      router.refresh();
     } catch (error) {
       setStatus("error");
       setMessage(error instanceof Error ? error.message : "Failed to create client");
     }
   };
+
+  const connectionError = firebaseError ?? listenerError;
+  const isLoading = !firebaseReady || loading;
 
   return (
     <section className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm">
@@ -62,26 +68,17 @@ export function DashboardPanel({ initialClients }: DashboardPanelProps) {
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
           <p className="mt-2 text-zinc-600">
-            Week 1 foundation: authenticated API routes connected to Firestore.
+            Active clients update in real time as deal activity changes.
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => router.refresh()}
-            className="rounded-full border border-zinc-300 px-4 py-2 text-sm font-medium transition hover:bg-zinc-100"
-          >
-            Refresh clients
-          </button>
-          <button
-            type="button"
-            onClick={() => void createSampleClient()}
-            disabled={status === "loading"}
-            className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            Add sample client
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => void createSampleClient()}
+          disabled={status === "loading" || !firebaseReady}
+          className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          Add sample client
+        </button>
       </div>
 
       {message ? (
@@ -93,40 +90,33 @@ export function DashboardPanel({ initialClients }: DashboardPanelProps) {
         </p>
       ) : null}
 
-      {initialClients.length === 0 ? (
-        <p className="mt-6 rounded-xl border border-dashed border-zinc-300 p-6 text-sm text-zinc-500">
-          No clients yet. Use &quot;Add sample client&quot; to verify the POST route.
+      {connectionError ? (
+        <p className="mt-4 text-sm text-red-600" role="alert">
+          {connectionError}
         </p>
       ) : null}
 
-      <ul className="mt-6 grid gap-4 md:grid-cols-2">
-        {initialClients.map((client) => (
-          <li
-            key={client.id}
-            className="rounded-xl border border-zinc-200 p-5 shadow-sm"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h2 className="text-lg font-semibold">{client.name}</h2>
-                <p className="text-sm text-zinc-600">{client.email}</p>
-              </div>
-              <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800">
-                {client.stage}
-              </span>
-            </div>
-            <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <dt className="text-zinc-500">Phone</dt>
-                <dd>{client.phone}</dd>
-              </div>
-              <div>
-                <dt className="text-zinc-500">Budget</dt>
-                <dd>
-                  ${client.budgetMin.toLocaleString()} - $
-                  {client.budgetMax.toLocaleString()}
-                </dd>
-              </div>
-            </dl>
+      {isLoading ? (
+        <p className="mt-6 text-sm text-zinc-500">Loading clients...</p>
+      ) : null}
+
+      {!isLoading && clients.length === 0 ? (
+        <p className="mt-6 rounded-xl border border-dashed border-zinc-300 p-6 text-sm text-zinc-500">
+          No clients yet. Use &quot;Add sample client&quot; to create your first
+          pipeline record.
+        </p>
+      ) : null}
+
+      <ul className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {clients.map((client) => (
+          <li key={client.id}>
+            <ClientCard
+              client={client}
+              onClick={() => {
+                setMessage(`Client detail view coming in Week 3 for ${client.name}.`);
+                setStatus("idle");
+              }}
+            />
           </li>
         ))}
       </ul>

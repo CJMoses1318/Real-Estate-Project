@@ -34,6 +34,9 @@ export function mapClientDoc(
     address: data.address ? String(data.address) : undefined,
     searchCriteria: data.searchCriteria ? String(data.searchCriteria) : undefined,
     stage: data.stage as Client["stage"],
+    latestNote: data.latestNote
+      ? String(data.latestNote)
+      : "No notes yet",
     lastActivityAt: Number(data.lastActivityAt),
     createdAt: Number(data.createdAt),
   };
@@ -76,4 +79,8 @@ export function buildInitialActivityEntries(
   }
 
   return entries;
+}
+
+export function getLatestNoteFromIntake(input: CreateClientInput): string {
+  return input.firstNote?.trim() || "Client intake completed.";
 }

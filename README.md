@@ -2,6 +2,21 @@
 
 I worked as a licensed Realtor managing multiple active client pipelines simultaneously. The standard workflow — tracking deal stages, document checklists, and follow-up tasks — required either an over-engineered enterprise CRM or a spreadsheet. This tool is a purpose-built alternative for solo agents and small teams.
 
+## Week 2 Status
+
+Week 2 adds the live dashboard experience:
+
+- `ClientCard` component with urgency indicators (amber after 5 days, red after 10 days)
+- Real-time dashboard via Firestore `onSnapshot` listeners
+- Clerk-to-Firebase custom token bridge for secured client reads
+- Jest + React Testing Library suite with 4 passing `ClientCard` tests
+
+Run tests with:
+
+```bash
+npm test
+```
+
 ## Week 1 Status
 
 Week 1 delivers the project foundation:
@@ -38,6 +53,7 @@ Each client document is scoped to a signed-in agent via `ownerId` (Clerk user ID
 | `address` | `string?` | Property address (optional) |
 | `searchCriteria` | `string?` | Search preferences (optional) |
 | `stage` | `DealStage` | Current pipeline stage |
+| `latestNote` | `string` | Most recent note shown on dashboard cards |
 | `lastActivityAt` | `number` | Unix timestamp of most recent activity |
 | `createdAt` | `number` | Unix timestamp when client was created |
 
@@ -80,6 +96,10 @@ Stage-based document checklist items.
 ### `GET /api/clients`
 
 Returns all clients for the authenticated agent, ordered by most recent activity.
+
+### `GET /api/firebase/token`
+
+Returns a Firebase custom auth token for the signed-in Clerk user. Used by the dashboard to establish secured Firestore listeners.
 
 ### `POST /api/clients`
 
@@ -155,25 +175,38 @@ Open [http://localhost:3000](http://localhost:3000), sign in, and use **Add samp
 src/
   app/
     api/clients/route.ts      # GET + POST clients
+    api/firebase/token/route.ts
     sign-in/[[...sign-in]]/   # Clerk sign-in
     sign-up/[[...sign-up]]/   # Clerk sign-up
     layout.tsx
-    page.tsx                  # Week 1 dashboard shell
+    page.tsx                  # Dashboard entry
+    dashboard-panel.tsx       # Real-time client grid
+  components/
+    ClientCard.tsx
+    ClientCard.test.tsx
+    site-header.tsx
+  hooks/
+    useFirebaseAuth.ts
+    useClientsListener.ts
   lib/
     types.ts                  # Shared TypeScript interfaces
     schemas.ts                # Zod validation schemas
     clients.ts                # Mapping + seed helpers
+    urgency.ts                # Urgency indicator logic
+    stages.ts                 # Deal stage labels
     firebaseClient.ts         # Client SDK init
     firebaseAdmin.ts          # Admin SDK init
   middleware.ts               # Clerk route protection
 firestore.rules
 firestore.indexes.json
 firebase.json
+jest.config.mjs
+jest.setup.ts
 ```
 
-## Next Steps (Week 2+)
+## Next Steps (Week 3+)
 
-- Build `ClientCard` with urgency indicators
-- Connect dashboard to real-time Firestore listeners
-- Add Jest + React Testing Library coverage
+- Build client detail view with checklist and activity log
+- Add `PUT /api/clients/:id` for stage updates and notes
+- Expand test coverage to form and stage components
 # Real-Estate-Project

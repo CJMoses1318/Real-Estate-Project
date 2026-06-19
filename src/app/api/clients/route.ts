@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import {
   buildChecklistItems,
   buildInitialActivityEntries,
+  getLatestNoteFromIntake,
   mapClientDoc,
 } from "@/lib/clients";
 import { getAdminDb } from "@/lib/firebaseAdmin";
@@ -57,6 +58,8 @@ export async function POST(
     const db = getAdminDb();
     const clientRef = db.collection("clients").doc();
 
+    const latestNote = getLatestNoteFromIntake(parsed.data);
+
     const clientData = {
       ownerId: userId,
       name: parsed.data.name,
@@ -68,6 +71,7 @@ export async function POST(
       address: parsed.data.address,
       searchCriteria: parsed.data.searchCriteria,
       stage: "inquiry" as const,
+      latestNote,
       lastActivityAt: now,
       createdAt: now,
     };
