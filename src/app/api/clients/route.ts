@@ -68,8 +68,10 @@ export async function POST(
       propertyType: parsed.data.propertyType,
       budgetMin: parsed.data.budgetMin,
       budgetMax: parsed.data.budgetMax,
-      address: parsed.data.address,
-      searchCriteria: parsed.data.searchCriteria,
+      ...(parsed.data.address ? { address: parsed.data.address } : {}),
+      ...(parsed.data.searchCriteria
+        ? { searchCriteria: parsed.data.searchCriteria }
+        : {}),
       stage: "inquiry" as const,
       latestNote,
       lastActivityAt: now,

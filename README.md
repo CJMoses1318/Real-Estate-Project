@@ -2,6 +2,16 @@
 
 I worked as a licensed Realtor managing multiple active client pipelines simultaneously. The standard workflow — tracking deal stages, document checklists, and follow-up tasks — required either an over-engineered enterprise CRM or a spreadsheet. This tool is a purpose-built alternative for solo agents and small teams.
 
+## Week 3 Status
+
+Week 3 adds the client detail experience:
+
+- `/clients/[id]` detail page with contact info, stage dropdown, document checklist, and activity log
+- `GET /api/clients/:id` and `PUT /api/clients/:id` for reads and updates
+- Stage changes and notes append to the activity log automatically
+- Checklist items toggle complete/incomplete and persist to Firestore
+- Real-time detail updates via Firestore listeners
+
 ## Week 2 Status
 
 Week 2 adds the live dashboard experience:
@@ -124,6 +134,28 @@ Example body:
 }
 ```
 
+### `GET /api/clients/:id`
+
+Returns a single client with activity log and document checklist items.
+
+### `PUT /api/clients/:id`
+
+Updates a client owned by the signed-in agent. Supported actions:
+
+```json
+{ "action": "updateStage", "stage": "propertySearch" }
+```
+
+```json
+{ "action": "addNote", "note": "Follow-up call scheduled for Friday." }
+```
+
+```json
+{ "action": "toggleDocument", "documentId": "abc123", "complete": true }
+```
+
+Stage changes and notes update `lastActivityAt`, `latestNote`, and append to the activity log.
+
 ## Local Setup
 
 ### 1. Install dependencies
@@ -204,9 +236,9 @@ jest.config.mjs
 jest.setup.ts
 ```
 
-## Next Steps (Week 3+)
+## Next Steps (Week 4+)
 
-- Build client detail view with checklist and activity log
-- Add `PUT /api/clients/:id` for stage updates and notes
+- Build `AddClientForm` with React Hook Form + Zod
+- Add dashboard search and filter bar
 - Expand test coverage to form and stage components
 # Real-Estate-Project

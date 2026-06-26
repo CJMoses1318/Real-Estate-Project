@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { ClientCard } from "@/components/ClientCard";
@@ -8,6 +9,7 @@ import { useClientsListener } from "@/hooks/useClientsListener";
 import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
 
 export function DashboardPanel() {
+  const router = useRouter();
   const { userId } = useAuth();
   const { ready: firebaseReady, error: firebaseError } = useFirebaseAuth();
   const {
@@ -112,10 +114,7 @@ export function DashboardPanel() {
           <li key={client.id}>
             <ClientCard
               client={client}
-              onClick={() => {
-                setMessage(`Client detail view coming in Week 3 for ${client.name}.`);
-                setStatus("idle");
-              }}
+              onClick={(clientId) => router.push(`/clients/${clientId}`)}
             />
           </li>
         ))}

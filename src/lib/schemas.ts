@@ -20,3 +20,21 @@ export const createClientSchema = z
   });
 
 export const dealStageSchema = z.enum(DEAL_STAGES);
+
+export const updateClientSchema = z.discriminatedUnion("action", [
+  z.object({
+    action: z.literal("updateStage"),
+    stage: dealStageSchema,
+  }),
+  z.object({
+    action: z.literal("addNote"),
+    note: z.string().trim().min(1, "Note cannot be empty"),
+  }),
+  z.object({
+    action: z.literal("toggleDocument"),
+    documentId: z.string().trim().min(1, "Document ID is required"),
+    complete: z.boolean(),
+  }),
+]);
+
+export type UpdateClientInput = z.infer<typeof updateClientSchema>;

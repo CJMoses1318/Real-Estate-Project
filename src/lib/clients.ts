@@ -4,6 +4,7 @@ import type {
   CreateClientInput,
   DocumentChecklistItem,
 } from "./types";
+import { formatStage } from "./stages";
 
 export const DEFAULT_DOCUMENT_CHECKLIST: Record<
   Client["stage"],
@@ -83,4 +84,34 @@ export function buildInitialActivityEntries(
 
 export function getLatestNoteFromIntake(input: CreateClientInput): string {
   return input.firstNote?.trim() || "Client intake completed.";
+}
+
+export function mapActivityDoc(
+  id: string,
+  data: Record<string, unknown>,
+): ActivityLogEntry {
+  return {
+    id,
+    clientId: String(data.clientId),
+    type: data.type as ActivityLogEntry["type"],
+    message: String(data.message),
+    createdAt: Number(data.createdAt),
+  };
+}
+
+export function mapDocumentDoc(
+  id: string,
+  data: Record<string, unknown>,
+): DocumentChecklistItem {
+  return {
+    id,
+    clientId: String(data.clientId),
+    stage: data.stage as DocumentChecklistItem["stage"],
+    label: String(data.label),
+    complete: Boolean(data.complete),
+  };
+}
+
+export function formatStageChangeMessage(stage: Client["stage"]): string {
+  return `Stage updated to ${formatStage(stage)}.`;
 }
