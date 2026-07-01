@@ -9,6 +9,7 @@ import { StageDropdown } from "@/components/StageDropdown";
 import { useClientDetail } from "@/hooks/useClientDetail";
 import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
 import { formatStage } from "@/lib/stages";
+import { copyClientExportSummary } from "@/lib/exportClient";
 import type { DealStage } from "@/lib/types";
 
 interface ClientDetailPanelProps {
@@ -147,11 +148,26 @@ export function ClientDetailPanel({ clientId }: ClientDetailPanelProps) {
               Current stage: {formatStage(client.stage)}
             </p>
           </div>
-          <StageDropdown
-            value={client.stage}
-            disabled={isUpdating}
-            onChange={(stage) => void handleStageChange(stage)}
-          />
+          <div className="flex flex-col gap-3 sm:items-end">
+            <StageDropdown
+              value={client.stage}
+              disabled={isUpdating}
+              onChange={(stage) => void handleStageChange(stage)}
+            />
+            <button
+              type="button"
+              disabled={isUpdating}
+              onClick={() =>
+                void copyClientExportSummary(client).then(() => {
+                  setStatus("idle");
+                  setMessage("Client summary copied to clipboard.");
+                })
+              }
+              className="rounded-full border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              Export summary
+            </button>
+          </div>
         </div>
 
         {message ? (

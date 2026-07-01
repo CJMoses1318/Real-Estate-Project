@@ -2,6 +2,16 @@
 
 I worked as a licensed Realtor managing multiple active client pipelines simultaneously. The standard workflow — tracking deal stages, document checklists, and follow-up tasks — required either an over-engineered enterprise CRM or a spreadsheet. This tool is a purpose-built alternative for solo agents and small teams.
 
+## Week 4 Status
+
+Week 4 completes the intake flow and dashboard filtering:
+
+- `AddClientForm` with React Hook Form + Zod validation wired to `POST /api/clients`
+- Form resets on successful submission
+- `SearchFilterBar` to search by name/email and filter by deal stage
+- Plain-text client summary export on the detail page
+- 3 new `AddClientForm` tests (7 total across the suite)
+
 ## Week 3 Status
 
 Week 3 adds the client detail experience:
@@ -236,9 +246,9 @@ jest.config.mjs
 jest.setup.ts
 ```
 
-## Next Steps (Week 4+)
+## Next Steps (Week 5+)
 
-- Build `AddClientForm` with React Hook Form + Zod
-- Add dashboard search and filter bar
-- Expand test coverage to form and stage components
+- Build Kanban board with drag-and-drop stage updates
+- Add `StageDropdown` tests to expand coverage toward MVP target
+- Set up GitHub Actions CI and deploy to Vercel
 # Real-Estate-Project
